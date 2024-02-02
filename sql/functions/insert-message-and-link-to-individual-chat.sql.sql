@@ -18,6 +18,7 @@ VALUES
     (newly_inserted_message_id, in_individual_chat_id);
 
 -- Here you can make the http request to the edge function used to send the notifications
+-- The edge function I created can be used for this as it is generic
 -- This is is transaction if an exception is raised it wont commit
 EXCEPTION
 WHEN OTHERS THEN RAISE EXCEPTION 'An error occurred while inserting into individual_chat_messages';

@@ -1,7 +1,7 @@
 // - This Edge function makes use of Firebase Cloud Messaging to deliver push notification to registered devices.
 // - You need a service acccount and a Firebase project setup with Cloud messaging enabled.
 // - Supabase secrets are available to edge functions by default so no intervention is required to push secrets.
-// - I have added and handled cors headers incase the function is invoked from a browser
+// - I have added and handled cors headers incase the function is invoked from a browser/web app
 
 
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
@@ -47,6 +47,7 @@ serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response("ok", { headers: corsHeaders });
   }
+
   if (req.method === "POST") {
     const { user_id, body } = await req.json();
     const { data, error } = await supabase
@@ -54,6 +55,7 @@ serve(async (req) => {
       .select("fcm_token")
       .eq("id", user_id)
       .single();
+
     if (error) {
       console.error("Supabase error:", error);
       return new Response("Internal Server Error", {
@@ -61,6 +63,7 @@ serve(async (req) => {
         headers: corsHeaders,
       });
     }
+
     const fcmToken = data!.fcm_token as string;
     const res = await fetch(
       `https://fcm.googleapis.com/v1/projects/${serviceAccount.project_id}/messages:send`,
@@ -82,10 +85,12 @@ serve(async (req) => {
     if (res.status < 200 || 299 < res.status) {
       throw resData;
     }
+
     return new Response(JSON.stringify(resData), {
       headers: { "Content-Type": "application/json" , ...corsHeaders},
     });
   }
+
   return new Response("Invalid Request", {
     status: 400,
     headers: corsHeaders,

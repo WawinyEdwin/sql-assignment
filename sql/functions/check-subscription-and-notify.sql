@@ -1,5 +1,7 @@
 -- Postgres Extensions
+-- These may be available on the Supabase project,
 CREATE EXTENSION IF NOT EXISTS http;
+
 CREATE EXTENSION IF NOT EXISTS pg_cron;
 
 CREATE
@@ -12,8 +14,7 @@ SELECT
 FROM
     subscriptions
 WHERE
-    CURRENT_TIMESTAMP + INTERVAL '7 days' >= end_date LOOP
-    -- I turned off JWT verification as the call is made from a secure env(Inside the DB) based on my requirements
+    CURRENT_TIMESTAMP + INTERVAL '7 days' >= end_date LOOP -- I turned off JWT verification as the call is made from a secure env(Inside the DB) based on my requirements
     -- send a notification to the user
     url := 'https://tbvkvsxgntavgnllkxhd.supabase.co/functions/v1/notify';
 
@@ -42,7 +43,7 @@ END;
 $ $ LANGUAGE plpgsql;
 
 -- Schedule the function to run daily at 12:00 AM
--- This can be changed to a time the users are mostlikely to interact with the app
+-- This can be changed to a time the users are most likely to interact with the app.
 SELECT
     cron.schedule (
         '0 0 * * *',
